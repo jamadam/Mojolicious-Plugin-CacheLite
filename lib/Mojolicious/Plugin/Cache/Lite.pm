@@ -24,8 +24,6 @@ use Mojo::Cache::ByteLimited;
                 if (my $key = $key_generater->($c)) {
                     my $data = Mojo::JSON->decode($cache->get($key));
                     if (defined $data) {
-                        use Data::Dumper;
-                        warn Dumper $data;
                         $app->log->debug("serving from cache for $key");
                         $c->res->code($data->{code});
                         $c->res->headers($data->{headers});
@@ -42,8 +40,6 @@ use Mojo::Cache::ByteLimited;
             'after_dispatch' => sub {
                 my $c = shift;
                 
-                #conditions at which no caching will be done
-                ## - it is already a cached response
                 return if $c->stash('from_cache');
                 
                 ## - has to be GET request
