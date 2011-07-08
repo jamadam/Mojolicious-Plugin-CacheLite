@@ -62,7 +62,23 @@ Mojolicious::Plugin::Cache::Lite -
 =head1 SYNOPSIS
 
     use Mojolicious::Plugin::Cache::Lite;
-    Mojolicious::Plugin::Cache::Lite->new;
+    
+    sub startup {
+        my $self = shift;
+        
+        $self->plugin('cache_lite');
+        
+        or
+        
+        $self->plugin(cache_lite => {key_generater => sub {
+            my $c = shift;
+            
+            # generate key here maybe with $c
+            # return undef causes cache disable
+            
+            return $key;
+        }});
+    }
 
 =head1 DESCRIPTION
 
