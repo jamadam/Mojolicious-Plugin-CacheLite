@@ -12,55 +12,43 @@ use Mojo::Cache::ByteLimited;
         my $key_generater = $conf->{key_generater} || sub {
             shift->req->url->to_abs->to_string;
         };
-    
+        
         my $cache = Mojo::Cache::ByteLimited->new;
         
-        $app->plugins->add_hook(
-            'before_dispatch' => sub {
-                my ($c) = shift;
-                
-                return if $c->req->method ne 'GET';
-                
-                if (my $key = $key_generater->($c)) {
-                    my $data = Mojo::JSON->decode($cache->get($key));
-                    if (defined $data) {
-                        $app->log->debug("serving from cache for $key");
-                        $c->res->code($data->{code});
-                        $c->res->headers($data->{headers});
-                        $c->res->body($data->{body});
-                        $c->stash('from_cache' => 1);
-                        $c->rendered;
-                        #$c->render('');
-                    }
+        my $on_process_org = $app->on_process;
+        
+        $app->on_process(sub {
+            
+            my ($app, $c) = @_;
+            
+            my $active = ($c->req->method eq 'GET');
+            my $key = $key_generater->($c);
+            
+            if ($active && $key) {
+                my $data = Mojo::JSON->decode($cache->get($key));
+                if (defined $data) {
+                    $app->log->debug("serving from cache for $key");
+                    $c->res->code($data->{code});
+                    $c->res->headers(bless $data->{headers}, 'Mojo::Headers');
+                    $c->res->body($data->{body});
+                    $c->rendered;
+                    $c->render_text(''); ## cheat mojolicious
+                    return;
                 }
             }
-        );
-    
-        $app->plugins->add_hook(
-            'after_dispatch' => sub {
-                my $c = shift;
-                
-                return if $c->stash('from_cache');
-                
-                ## - has to be GET request
-                return if $c->req->method ne 'GET';
-                
-                ## - only successful response
-                return if $c->res->code != 200;
-                
-                if (my $key = $key_generater->($c)) {
-                    $app->log->debug("storing in cache for $key");
-                    my %header = %{$c->res->headers};
-                    $cache->set($key, Mojo::JSON->encode({
-                        body    => $c->res->body,
-                        headers => \%header,
-                        code    => $c->res->code
-                    }));
-                }
+            
+            $on_process_org->($app, $c);
+            
+            if ($active && $key && $c->res->code == 200) {
+                $app->log->debug("storing in cache for $key");
+                my %header = %{$c->res->headers};
+                $cache->set($key, Mojo::JSON->encode({
+                    body    => $c->res->body,
+                    headers => \%header,
+                    code    => $c->res->code
+                }));
             }
-        );
-    
-        return;
+        });
     }
 
 1;
@@ -80,15 +68,19 @@ Mojolicious::Plugin::Cache::Lite -
 
 =head1 METHODS
 
-=head2 new
+=head2 register
+
+$plugin->register;
+
+Register plugin hooks in L<Mojolicious> application.
 
 =head1 AUTHOR
 
-sugama, E<lt>sugama@jamadam.comE<gt>
+Sugama, E<lt>sugama@jamadam.comE<gt>
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright (C) 2011 by sugama.
+Copyright (C) 2011 by Sugama.
 
 This program is free software; you can redistribute it and/or
 modify it under the same terms as Perl itself.

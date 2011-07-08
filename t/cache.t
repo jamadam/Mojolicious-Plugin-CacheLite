@@ -3,7 +3,7 @@
 use strict;
 use warnings;
 
-use Test::More tests => 21;
+use Test::More tests => 31;
 
 # "You know, most people pray silently.
 #  Marge He's way the hell up there."

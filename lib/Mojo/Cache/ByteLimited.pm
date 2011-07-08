@@ -1,4 +1,6 @@
 package Mojo::Cache::ByteLimited;
+use strict;
+use warnings;
 use Mojo::Base -base;
     
     has 'max_keys' => 100;
@@ -66,6 +68,13 @@ L<Mojo::Cache> implements the following attributes.
 
 Maximum number of cache keys, defaults to C<100>.
 
+=head2 C<max_bytes>
+
+  my $max_bytes = $cache->max_bytes;
+  $cache       = $cache->max_bytes(10000000);
+
+Maximum size of value length sum, defaults to C<5000000>.
+
 =head1 METHODS
 
 L<Mojo::Cache> inherits all methods from L<Mojo::Base> and implements the
@@ -82,6 +91,12 @@ Get cached value.
   $cache = $cache->set(foo => 'bar');
 
 Set cached value.
+
+=head2 C<remove>
+
+  $cache = $cache->remove('foo');
+
+Remove cached value.
 
 =head1 SEE ALSO
 

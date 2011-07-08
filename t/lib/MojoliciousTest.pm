@@ -12,7 +12,20 @@ sub development_mode {
 sub startup {
   my $self = shift;
   
-  $self->plugin('cache-lite' => {key_generater => sub{undef}});
+  $self->plugin('cache-lite' => {key_generater => sub{
+    my $c = shift;
+    my $path = $c->req->url->path;
+    if ($path =~ qr{/auth/}) {
+      return;
+    }
+    if ($c->req->headers->header('X-Pass')) {
+      return;
+    }
+    if ($c->req->headers->header('If-Modified-Since')) {
+      return;
+    }
+    return $path;
+  }});
 
   # Plugin
   unshift @{$self->plugins->namespaces},

@@ -17,7 +17,7 @@ use MojoX::Tusu;
         
         sub startup {
             my $self = shift;
-            $self->plugin(plack_middleware => ['TestFilter2', sub {my $c = shift;1}, {charset => 'Shift_JIS'}]);
+            $self->plugin('cache-lite');
         }
 
 	package Plack::Middleware::TestFilter2;
