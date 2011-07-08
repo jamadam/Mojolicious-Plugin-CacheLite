@@ -13,7 +13,11 @@ use Mojo::Cache::ByteLimited;
             shift->req->url->to_abs->to_string;
         };
         
-        my $cache = Mojo::Cache::ByteLimited->new;
+        my $cache = Mojo::Cache::ByteLimited->new();
+        
+        if ($conf->{max_bytes}) {
+            $cache->max_bytes($conf->{max_bytes});
+        }
         
         my $on_process_org = $app->on_process;
         
@@ -57,7 +61,7 @@ __END__
 
 =head1 NAME
 
-Mojolicious::Plugin::Cache::Lite - 
+Mojolicious::Plugin::Cache::Lite - On memory cache plugin
 
 =head1 SYNOPSIS
 
@@ -70,17 +74,33 @@ Mojolicious::Plugin::Cache::Lite -
         
         or
         
-        $self->plugin(cache_lite => {key_generater => sub {
-            my $c = shift;
-            
-            # generate key here maybe with $c
-            # return undef causes cache disable
-            
-            return $key;
-        }});
+        $self->plugin(cache_lite => {
+            max_bytes => 1000000,
+            key_generater => sub {
+                my $c = shift;
+                
+                # generate key here maybe with $c
+                # return undef causes cache disable
+                
+                return $key;
+            },
+        });
     }
 
 =head1 DESCRIPTION
+
+Mojolicious::Plugin::Cache::Lite provides on memory cache mechanism for
+mojolicious.
+
+=over
+
+=item No dependency
+
+=item Pure Perl.
+
+=ttem Hookable expiretion control [not implemented yet]
+
+=back
 
 =head1 METHODS
 
