@@ -98,7 +98,7 @@ mojolicious.
 
 =item Pure Perl.
 
-=ttem Hookable expiretion control [not implemented yet]
+=item Hookable expiretion control [not implemented yet]
 
 =back
 
