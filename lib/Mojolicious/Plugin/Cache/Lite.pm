@@ -43,7 +43,9 @@ use Mojo::Cache::ByteLimited;
             
             $on_process_org->($app, $c);
             
-            if ($active && $key && $c->res->code == 200) {
+            my $code = $c->res->code;
+            
+            if ($active && $key && $code && $code == 200) {
                 $app->log->debug("storing in cache for $key");
                 my %header = %{$c->res->headers};
                 $cache->set($key, Mojo::JSON->encode({
