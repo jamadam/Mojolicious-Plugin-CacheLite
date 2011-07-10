@@ -19,7 +19,7 @@ use Mojo::Base -base;
                 return;
             }
         }
-        return ($_[0]->{$ATTR_CACHE} || {})->{$_[1]};
+        ($_[0]->{$ATTR_CACHE} || {})->{$_[1]};
     }
     
     sub set {
