@@ -1,4 +1,4 @@
-package Mojo::Cache::ByteLimited;
+package Mojo::Cache::Extended;
 use strict;
 use warnings;
 use Mojo::Base -base;
@@ -124,6 +124,15 @@ Set cached value.
   $cache = $cache->remove('foo');
 
 Remove cached value.
+
+=head2 C<set_expire>
+
+Sets expiration condition by code refs. This method always wrap
+the original one.
+    
+    $cache->set_expire('foo' => sub{
+        my $ts = shift;
+    });
 
 =head1 SEE ALSO
 

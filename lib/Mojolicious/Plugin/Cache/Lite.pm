@@ -4,7 +4,7 @@ use warnings;
 our $VERSION = '0.01';
 use base qw/Mojolicious::Plugin/;
 use Mojo::JSON;
-use Mojo::Cache::ByteLimited;
+use Mojo::Cache::Extended;
 
     sub register {
         my ( $self, $app, $conf ) = @_;
@@ -13,7 +13,7 @@ use Mojo::Cache::ByteLimited;
             shift->req->url->to_abs->to_string;
         };
         
-        my $cache = Mojo::Cache::ByteLimited->new();
+        my $cache = Mojo::Cache::Extended->new();
         
         if ($conf->{max_bytes}) {
             $cache->max_bytes($conf->{max_bytes});
@@ -100,7 +100,7 @@ mojolicious.
 
 =item Pure Perl.
 
-=item Hookable expiretion control [not implemented yet]
+=item Flexible expiration control [not implemented yet]
 
 =back
 
