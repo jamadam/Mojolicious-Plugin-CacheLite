@@ -13,14 +13,13 @@ use Mojo::Base -base;
     my $ATTR_TIMESTAMP = 5;
     
     sub get {
-        my ($self, $key) = @_;
-        if (my $val = ($self->{$ATTR_CACHE} || {})->{$key}) {
-            my $expire = ($self->{$ATTR_EXPIRE} || {})->{$key};
-            if ($expire && $expire->($self->{$ATTR_TIMESTAMP}->{$key})) {
+        if ($_[0]->{$ATTR_EXPIRE}) {
+            my $expire = $_[0]->{$ATTR_EXPIRE}->{$_[1]};
+            if ($expire && $expire->($_[0]->{$ATTR_TIMESTAMP}->{$_[1]})) {
                 return;
             }
-            return $val;
         }
+        return ($_[0]->{$ATTR_CACHE} || {})->{$_[1]};
     }
     
     sub set {
