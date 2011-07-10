@@ -6,6 +6,13 @@ use base qw/Mojolicious::Plugin/;
 use Mojo::JSON;
 use Mojo::Cache::Extended;
 
+    our $_EXPIRE_CODE_ARRAY = [];
+    
+    sub set_expire {
+        my ($class, $code) = @_;
+        push @$_EXPIRE_CODE_ARRAY, $code;
+    }
+    
     sub register {
         my ( $self, $app, $conf ) = @_;
         
@@ -41,6 +48,8 @@ use Mojo::Cache::Extended;
                 }
             }
             
+            local $_EXPIRE_CODE_ARRAY;
+            
             $on_process_org->($app, $c);
             
             my $code = $c->res->code;
@@ -51,8 +60,11 @@ use Mojo::Cache::Extended;
                 $cache->set($key, Mojo::JSON->encode({
                     body    => $c->res->body,
                     headers => \%header,
-                    code    => $c->res->code
+                    code    => $c->res->code,
                 }));
+                for my $code (@$_EXPIRE_CODE_ARRAY) {
+                    $cache->set_expire($key, $code);
+                }
             }
         });
     }
