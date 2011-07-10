@@ -56,3 +56,20 @@ is $cache->get('foo'),  undef,  'no result';
 is $cache->get('bar'),  'baz',  'right result';
 is $cache->get('baz'),  'yada', 'right result';
 is $cache->get('yada'), 23,     'right result';
+
+$cache = Mojo::Cache::ByteLimited->new(max_keys => 10000, max_bytes => 10);
+$cache->set(foo => 'bar');
+$cache->set_expire('foo' => sub{1});
+is $cache->get('foo'), undef, 'has expired';
+
+$cache = Mojo::Cache::ByteLimited->new(max_keys => 10000, max_bytes => 10);
+$cache->set(foo => 'bar');
+$cache->set_expire('foo' => sub{
+    my $ts = shift;
+    is time - $ts, 1, '1 sec passed';
+});
+sleep(1);
+is $cache->get('foo'), undef, 'has expired';
+
+use Data::Dumper;
+warn Dumper $cache;
