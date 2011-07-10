@@ -42,10 +42,13 @@ This plugin caches whole response into key-value object and returns it for next
 request instead of invoking on_process code. You can specify the cache key by
 giving code reference which gets mojolicious controller for argument.
 
-You can also specify the expiration condition from anywhere by giving code
-reference for each cache key. The code reference will automatically be appended
-recuresively so that every MVC models specify their own expiration condition
-by themselves.
+You can also specify one or more expiration conditions for each cache key from
+anywhere in your app by giving code references.
+
+In many case, a single page output involves not only one data model and each of
+the models may should have own cache expiration conditions. To expire a cache
+exactly right timing, the cache itself must know when to expire. The feature of
+this class provides the mechanism.
 
 =head1 METHODS
 
@@ -57,7 +60,21 @@ Register plugin hooks in L<Mojolicious> application.
 
 =head2 Mojolicious::Plugin::Cache::Lite->set_expire($code_ref)
 
-This appends a code reference for cache expiration control.
+This appends a code reference for cache expiration control. 
+    
+    package Model::NewsRelease;
+    
+    my $sqlite_file = 'news_release.sqlite';
+    
+    sub list {
+        ...
+        
+        Mojolicious::Plugin::Cache::Lite->set_expire(sub {
+            my $cache_timestamp = shift;
+            return $cache_timestamp - (stat($sqlite_file))[9] > 0;
+        });
+        ...
+    }
 
 =head1 AUTHOR
 
