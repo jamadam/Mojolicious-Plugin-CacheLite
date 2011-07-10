@@ -115,7 +115,7 @@ mojolicious.
 
 This plugin caches whole response into key-value object and returns it for next
 request instead of invoking on_process code. You can specify the cache key by
-giving code reference which gets mojolicious controller.
+giving code reference which gets mojolicious controller for argument.
 
 You can also specify the expiration condition from anywhere by giving code
 reference for each cache key. The code reference will automatically be appended
