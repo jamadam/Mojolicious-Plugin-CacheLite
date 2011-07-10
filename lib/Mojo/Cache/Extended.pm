@@ -74,13 +74,13 @@ __END__
 
 =head1 NAME
 
-Mojo::Cache::ByteLimited - 
+Mojo::Cache::Extended - 
 
 =head1 SYNOPSIS
 
 =head1 DESCRIPTION
 
-L<Mojo::Cache::ByteLimited> is a Mojo::Cache sub class with byte limiter.
+L<Mojo::Cache::Extended> class represents caches. 
 
 Note that this module is EXPERIMENTAL and might change without warning!
 
