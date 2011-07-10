@@ -75,7 +75,7 @@ __END__
 
 =head1 NAME
 
-Mojolicious::Plugin::Cache::Lite - On memory cache plugin
+Mojolicious::Plugin::Cache::Lite - On memory cache plugin [ALPHA]
 
 =head1 SYNOPSIS
 
@@ -100,21 +100,27 @@ Mojolicious::Plugin::Cache::Lite - On memory cache plugin
             },
         });
     }
+    
+    sub some_where {
+        Mojolicious::Plugin::Cache::Lite->set_expire(sub {
+            my $cache_timestamp = shift;
+            return 1;
+        });
+    }
 
 =head1 DESCRIPTION
 
 Mojolicious::Plugin::Cache::Lite provides on memory cache mechanism for
 mojolicious.
 
-=over
+This plugin caches whole response into key-value object and returns it for next
+request instead of invoking on_process code. You can specify the cache key by
+giving code reference which gets mojolicious controller.
 
-=item No dependency
-
-=item Pure Perl.
-
-=item Flexible expiration control [not implemented yet]
-
-=back
+You can also specify the expiration condition from anywhere by giving code
+reference for each cache key. The code reference will automatically be appended
+recuresively so that every MVC models specify their own expiration condition
+by themselves.
 
 =head1 METHODS
 
@@ -123,6 +129,10 @@ mojolicious.
 $plugin->register;
 
 Register plugin hooks in L<Mojolicious> application.
+
+=head2 Mojolicious::Plugin::Cache::Lite->set_expire($code_ref)
+
+This appends a code reference for cache expiration control.
 
 =head1 AUTHOR
 
