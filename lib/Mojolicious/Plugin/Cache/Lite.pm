@@ -43,7 +43,6 @@ use Mojo::Cache::Extended;
                     $c->res->headers(bless $data->{headers}, 'Mojo::Headers');
                     $c->res->body($data->{body});
                     $c->rendered;
-                    $c->render_text(''); ## cheat mojolicious
                     return;
                 }
             }
