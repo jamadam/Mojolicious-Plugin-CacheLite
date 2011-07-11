@@ -14,8 +14,7 @@ use Mojo::Base -base;
     
     sub get {
         if ($_[0]->{$ATTR_EXPIRE}) {
-            my $expire = $_[0]->{$ATTR_EXPIRE}->{$_[1]};
-            if ($expire) {
+            if (my $expire = $_[0]->{$ATTR_EXPIRE}->{$_[1]}) {
                 for my $code (@$expire) {
                     if ($code->($_[0]->{$ATTR_TIMESTAMP}->{$_[1]})) {
                         return;
@@ -38,7 +37,10 @@ use Mojo::Base -base;
         $self->{$ATTR_TOTAL} += guess_size_of($value);
         
         while (@$stack >= $keys || $self->{$ATTR_TOTAL} > $max_length) {
-            $self->remove(shift @$stack);
+            my $key = shift @$stack;
+            $self->{$ATTR_TOTAL} -= guess_size_of($cache->{$key});
+            delete $cache->{$key};
+            delete $ts->{$key};
         }
         
         push @$stack, $key;
@@ -46,19 +48,6 @@ use Mojo::Base -base;
         $ts->{$key} = time;
         
         return $self;
-    }
-    
-    sub remove {
-        my ($self, $key) = @_;
-        my $cache = $self->{$ATTR_CACHE} ||= {};
-        my $stack = $self->{$ATTR_STACK} ||= [];
-        my $ts = $self->{$ATTR_TIMESTAMP} ||= {};
-        if (defined $cache->{$key}) {
-            $self->{$ATTR_TOTAL} -= guess_size_of($cache->{$key});
-            @$stack = grep {$_ ne $key} @$stack;
-            delete $cache->{$key};
-            delete $ts->{$key};
-        }
     }
     
     sub set_expire {
@@ -81,14 +70,14 @@ use Mojo::Base -base;
                         $res += length($key);
                         $res += guess_size_of($obj->{$key});
                     }
-                } else {
-                    return length($obj);
+                } elsif ($type eq 'SCALAR') {
+                    $res = length($$obj);
                 }
             }
-        } elsif($obj) {
-            $res = length("$obj");
+        } elsif ($obj) {
+            $res = length($obj);
         }
-        return $res;
+        $res;
     }
 
 1;
@@ -140,12 +129,6 @@ Get cached value.
   $cache = $cache->set(foo => 'bar');
 
 Set cached value.
-
-=head2 C<remove>
-
-  $cache = $cache->remove('foo');
-
-Remove cached value.
 
 =head2 C<set_expire>
 

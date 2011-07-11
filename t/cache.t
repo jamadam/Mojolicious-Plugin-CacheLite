@@ -3,7 +3,7 @@
 use strict;
 use warnings;
 
-use Test::More tests => 38;
+use Test::More tests => 39;
 
 # "You know, most people pray silently.
 #  Marge He's way the hell up there."
@@ -74,4 +74,5 @@ is $cache->get('foo'), undef, 'has expired';
 is Mojo::Cache::Extended::guess_size_of([1,2,3]), 3, 'right guess';
 is Mojo::Cache::Extended::guess_size_of(bless {a => 'test1', b => 'test2'}, 'Test'), 12, 'right guess';
 is Mojo::Cache::Extended::guess_size_of(bless {a => 'test1', b => [1,2,3]}, 'Test'), 10, 'right guess';
-is Mojo::Cache::Extended::guess_size_of(sub {1}), 15, 'right guess';
+is Mojo::Cache::Extended::guess_size_of(sub {1}), 0, 'right guess';
+is Mojo::Cache::Extended::guess_size_of(\'aaa'), 3, 'right guess';
