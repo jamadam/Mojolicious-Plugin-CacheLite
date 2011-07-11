@@ -109,12 +109,11 @@ request instead of invoking on_process code. You can specify the cache key by
 giving code reference which gets mojolicious controller for argument.
 
 You can also specify one or more expiration conditions for each cache key from
-anywhere in your app by giving code references.
-
-In many case, a single page output involves not only one data model and each of
-the models may should have own cache expiration conditions. To expire a cache
-exactly right timing, the cache itself must know when to expire. The feature of
-this class provides the mechanism.
+anywhere in your app by giving code references. In many case, a single page
+output involves not only one data model and each of the models may should have
+own cache expiration conditions. To expire a cache exactly right timing,
+the cache itself must know when to expire. The feature of this class provides
+the mechanism.
 
 =head1 METHODS
 

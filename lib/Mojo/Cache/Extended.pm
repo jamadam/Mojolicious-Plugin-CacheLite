@@ -15,8 +15,12 @@ use Mojo::Base -base;
     sub get {
         if ($_[0]->{$ATTR_EXPIRE}) {
             my $expire = $_[0]->{$ATTR_EXPIRE}->{$_[1]};
-            if ($expire && $expire->($_[0]->{$ATTR_TIMESTAMP}->{$_[1]})) {
-                return;
+            if ($expire) {
+                for my $code (@$expire) {
+                    if ($code->($_[0]->{$ATTR_TIMESTAMP}->{$_[1]})) {
+                        return;
+                    }
+                }
             }
         }
         ($_[0]->{$ATTR_CACHE} || {})->{$_[1]};
@@ -59,13 +63,7 @@ use Mojo::Base -base;
     
     sub set_expire {
         my ($self, $key, $cb) = @_;
-        my $org = $self->{$ATTR_EXPIRE}->{$key} || sub{};
-        $self->{$ATTR_EXPIRE}->{$key} = sub {
-            if ($cb->(@_) || $org->(@_)) {
-                $self->remove($key);
-                return 1;
-            }
-        };
+        push(@{$self->{$ATTR_EXPIRE}->{$key}}, $cb);
     }
     
     sub guess_size_of {
