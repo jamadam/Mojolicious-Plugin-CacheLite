@@ -59,13 +59,14 @@ use Time::HiRes qw(time);
                 $active = 0;
             }
             
-            my $code = $c->res->code;
-            
-            if ($active && $key && $code && $code == 200) {
-                $app->log->debug("storing in cache for $key");
-                $cache->set($key, $c->res);
-                for my $code (@$_EXPIRE_CODE_ARRAY) {
-                    $cache->set_expire($key, $code);
+            if ($active && $key) {
+                my $code = $c->res->code;
+                if ($code && $code == 200) {
+                    $app->log->debug("storing in cache for $key");
+                    $cache->set($key, $c->res);
+                    for my $code (@$_EXPIRE_CODE_ARRAY) {
+                        $cache->set_expire($key, $code);
+                    }
                 }
             }
         });
