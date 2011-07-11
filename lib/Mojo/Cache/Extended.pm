@@ -50,8 +50,8 @@ use Mojo::Base -base;
     
     sub remove {
         my ($self, $key) = @_;
-        my $cache = $self->{$ATTR_CACHE} || {};
-        my $stack = $self->{$ATTR_STACK} || [];
+        my $cache = $self->{$ATTR_CACHE} ||= {};
+        my $stack = $self->{$ATTR_STACK} ||= [];
         my $ts = $self->{$ATTR_TIMESTAMP} ||= {};
         if (defined $cache->{$key}) {
             $self->{$ATTR_TOTAL} -= guess_size_of($cache->{$key});
