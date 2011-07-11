@@ -15,7 +15,7 @@ Mojolicious::Plugin::CacheLite - On memory cache plugin [ALPHA]
         
         $self->plugin(cache_lite => {
             max_bytes => 1000000,
-            key_generater => sub {
+            keygen => sub {
                 my $c = shift;
                 
                 # generate key here maybe with $c

@@ -15,7 +15,7 @@ use Mojo::Cache::Extended;
     sub register {
         my ( $self, $app, $conf ) = @_;
         
-        my $key_generater = $conf->{key_generater} || sub {
+        my $keygen = $conf->{keygen} || sub {
             shift->req->url->to_abs->to_string;
         };
         
@@ -32,7 +32,7 @@ use Mojo::Cache::Extended;
             my ($app, $c) = @_;
             
             my $active = ($c->req->method eq 'GET');
-            my $key = $key_generater->($c);
+            my $key = $keygen->($c);
             
             if ($active && $key) {
                 my $res = $cache->get($key);
@@ -81,7 +81,7 @@ Mojolicious::Plugin::CacheLite - On memory cache plugin [ALPHA]
         
         $self->plugin(cache_lite => {
             max_bytes => 1000000,
-            key_generater => sub {
+            keygen => sub {
                 my $c = shift;
                 
                 # generate key here maybe with $c
