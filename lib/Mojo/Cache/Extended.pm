@@ -31,7 +31,7 @@ use Mojo::Base -base;
         my $stack = $self->{$ATTR_STACK} ||= [];
         my $ts = $self->{$ATTR_TIMESTAMP} ||= {};
         $self->{$ATTR_TOTAL} ||= 0;
-        $self->{$ATTR_TOTAL} += length($value);
+        $self->{$ATTR_TOTAL} += guess_size_of($value);
         
         while (@$stack >= $keys || $self->{$ATTR_TOTAL} > $max_length) {
             $self->remove(shift @$stack);
@@ -50,7 +50,7 @@ use Mojo::Base -base;
         my $stack = $self->{$ATTR_STACK} || [];
         my $ts = $self->{$ATTR_TIMESTAMP} ||= {};
         if (defined $cache->{$key}) {
-            $self->{$ATTR_TOTAL} -= length($cache->{$key});
+            $self->{$ATTR_TOTAL} -= guess_size_of($cache->{$key});
             @$stack = grep {$_ ne $key} @$stack;
             delete $cache->{$key};
             delete $ts->{$key};
@@ -66,6 +66,31 @@ use Mojo::Base -base;
                 return 1;
             }
         };
+    }
+    
+    sub guess_size_of {
+        
+        my $obj = shift;
+        my $res = 0;
+        if (ref $obj) {
+            if (my $type = ("$obj" =~ qr{(?:^|=)(\w+)\(})[0]) {
+                if ($type eq 'ARRAY') {
+                    for my $a (@$obj) {
+                        $res += guess_size_of($a);
+                    }
+                } elsif ($type eq 'HASH') {
+                    for my $key (keys %$obj) {
+                        $res += length($key);
+                        $res += guess_size_of($obj->{$key});
+                    }
+                } else {
+                    return length($obj);
+                }
+            }
+        } elsif($obj) {
+            $res = length("$obj");
+        }
+        return $res;
     }
 
 1;
@@ -132,6 +157,10 @@ the original one.
     $cache->set_expire('foo' => sub{
         my $ts = shift;
     });
+
+=head2 C<guess_size_of>
+
+This is aimed at internal use. This wild guesses the object size.
 
 =head1 SEE ALSO
 

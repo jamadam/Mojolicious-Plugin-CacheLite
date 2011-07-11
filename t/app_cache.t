@@ -10,7 +10,7 @@ BEGIN {
   $ENV{MOJO_MODE} = 'development';
 }
 
-use Test::More tests => 12;
+use Test::More tests => 18;
 
 use FindBin;
 use lib "$FindBin::Bin/lib";

@@ -20,20 +20,4 @@ use MojoX::Tusu;
             $self->plugin(cache_lite => {});
         }
 
-	package Plack::Middleware::TestFilter2;
-	use strict;
-	use warnings;
-	use base qw( Plack::Middleware );
-	
-	sub call {
-		
-		my $self = shift;
-		my $res = $self->app->(@_);
-		$self->response_cb($res, sub {
-			return sub {
-			};
-			$res;
-		});
-	}
-
 __END__

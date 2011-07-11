@@ -3,8 +3,7 @@ use strict;
 use warnings;
 our $VERSION = '0.01';
 use base qw/Mojolicious::Plugin/;
-use Mojo::JSON;
-use Mojo::Cache::Response;
+use Mojo::Cache::Extended;
 
     our $_EXPIRE_CODE_ARRAY = [];
     
@@ -20,7 +19,7 @@ use Mojo::Cache::Response;
             shift->req->url->to_abs->to_string;
         };
         
-        my $cache = Mojo::Cache::Response->new();
+        my $cache = Mojo::Cache::Extended->new();
         
         if ($conf->{max_bytes}) {
             $cache->max_bytes($conf->{max_bytes});
@@ -36,12 +35,10 @@ use Mojo::Cache::Response;
             my $key = $key_generater->($c);
             
             if ($active && $key) {
-                my $data = Mojo::JSON->decode($cache->get($key));
-                if (defined $data) {
+                my $res = $cache->get($key);
+                if (defined $res) {
                     $app->log->debug("serving from cache for $key");
-                    $c->res->code($data->{code});
-                    $c->res->headers(bless $data->{headers}, 'Mojo::Headers');
-                    $c->res->body($data->{body});
+                    $c->tx->res($res);
                     $c->rendered;
                     return;
                 }
@@ -55,14 +52,7 @@ use Mojo::Cache::Response;
             
             if ($active && $key && $code && $code == 200) {
                 $app->log->debug("storing in cache for $key");
-                my %header = %{$c->res->headers};
-                my $body = $c->res->body;
-                utf8::decode($body);
-                $cache->set($key, Mojo::JSON->encode({
-                    body    => $body,
-                    headers => \%header,
-                    code    => $c->res->code,
-                }));
+                $cache->set($key, $c->res);
                 for my $code (@$_EXPIRE_CODE_ARRAY) {
                     $cache->set_expire($key, $code);
                 }
