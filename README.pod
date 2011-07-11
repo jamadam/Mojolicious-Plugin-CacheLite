@@ -55,7 +55,7 @@ the mechanism.
 
 =head2 keygen => code reference [optional]
 
-Key generator for cache entries. This must be givin in code reference.
+Key generator for cache entries. This must be given in code reference.
 The following is the default.
 
     $self->plugin(cache_lite => {
@@ -64,6 +64,8 @@ The following is the default.
             return $c->req->url->to_abs->to_string;
         }
     });
+
+returning undef causes cache generation and reference disabled.
 
 =head2 max_bytes => number [optional]
 

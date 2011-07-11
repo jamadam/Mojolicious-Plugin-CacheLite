@@ -128,7 +128,7 @@ the mechanism.
 
 =head2 keygen => code reference [optional]
 
-Key generator for cache entries. This must be givin in code reference.
+Key generator for cache entries. This must be given in code reference.
 The following is the default.
 
     $self->plugin(cache_lite => {
