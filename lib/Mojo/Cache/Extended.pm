@@ -59,20 +59,17 @@ use Mojo::Base -base;
         
         my $obj = shift;
         my $res = 0;
-        if (ref $obj) {
-            if (my $type = ("$obj" =~ qr{(?:^|=)(\w+)\(})[0]) {
-                if ($type eq 'ARRAY') {
-                    for my $a (@$obj) {
-                        $res += guess_size_of($a);
-                    }
-                } elsif ($type eq 'HASH') {
-                    for my $key (keys %$obj) {
-                        $res += length($key);
-                        $res += guess_size_of($obj->{$key});
-                    }
-                } elsif ($type eq 'SCALAR') {
-                    $res = length($$obj);
+        if (ref $obj && (my $type = ("$obj" =~ qr{(?:^|=)(\w+)\(})[0])) {
+            if ($type eq 'ARRAY') {
+                for my $a (@$obj) {
+                    $res += guess_size_of($a);
                 }
+            } elsif ($type eq 'HASH') {
+                while (my ($key, $value) = each(%$obj)) {
+                    $res += length($key) + guess_size_of($value);
+                }
+            } elsif ($type eq 'SCALAR') {
+                $res = length($$obj);
             }
         } elsif ($obj) {
             $res = length($obj);
