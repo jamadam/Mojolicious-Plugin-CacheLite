@@ -1,4 +1,4 @@
-package Mojolicious::Plugin::Cache::Lite;
+package Mojolicious::Plugin::CacheLite;
 use strict;
 use warnings;
 our $VERSION = '0.01';
@@ -74,11 +74,11 @@ __END__
 
 =head1 NAME
 
-Mojolicious::Plugin::Cache::Lite - On memory cache plugin [ALPHA]
+Mojolicious::Plugin::CacheLite - On memory cache plugin [ALPHA]
 
 =head1 SYNOPSIS
 
-    use Mojolicious::Plugin::Cache::Lite;
+    use Mojolicious::Plugin::CacheLite;
     
     sub startup {
         my $self = shift;
@@ -101,7 +101,7 @@ Mojolicious::Plugin::Cache::Lite - On memory cache plugin [ALPHA]
     }
     
     sub some_where {
-        Mojolicious::Plugin::Cache::Lite->set_expire(sub {
+        Mojolicious::Plugin::CacheLite->set_expire(sub {
             my $cache_timestamp = shift;
             return 1;
         });
@@ -109,7 +109,7 @@ Mojolicious::Plugin::Cache::Lite - On memory cache plugin [ALPHA]
 
 =head1 DESCRIPTION
 
-Mojolicious::Plugin::Cache::Lite provides on memory cache mechanism for
+Mojolicious::Plugin::CacheLite provides on memory cache mechanism for
 mojolicious.
 
 This plugin caches whole response into key-value object and returns it for next
@@ -132,7 +132,7 @@ $plugin->register;
 
 Register plugin hooks in L<Mojolicious> application.
 
-=head2 Mojolicious::Plugin::Cache::Lite->set_expire($code_ref)
+=head2 Mojolicious::Plugin::CacheLite->set_expire($code_ref)
 
 This appends a code reference for cache expiration control. 
     
@@ -143,7 +143,7 @@ This appends a code reference for cache expiration control.
     sub list {
         ...
         
-        Mojolicious::Plugin::Cache::Lite->set_expire(sub {
+        Mojolicious::Plugin::CacheLite->set_expire(sub {
             my $cache_timestamp = shift;
             return $cache_timestamp - (stat($sqlite_file))[9] > 0;
         });

@@ -17,7 +17,7 @@ use MojoX::Tusu;
         
         sub startup {
             my $self = shift;
-            $self->plugin('cache-lite');
+            $self->plugin(cache_lite => {});
         }
 
 	package Plack::Middleware::TestFilter2;

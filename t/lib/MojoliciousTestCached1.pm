@@ -12,7 +12,7 @@ sub development_mode {
 sub startup {
   my $self = shift;
   
-  $self->plugin('cache-lite' => {key_generater => sub{
+  $self->plugin(cache_lite => {key_generater => sub{
     my $c = shift;
     my $path = $c->req->url->path;
     if ($path =~ qr{/cacheable/}) {

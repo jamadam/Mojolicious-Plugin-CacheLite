@@ -54,7 +54,7 @@ use Mojo::Base 'Mojolicious';
     sub startup {
       my $self = shift;
       
-      $self->plugin('cache-lite' => {key_generater => sub{
+      $self->plugin(cache_lite => {key_generater => sub{
         my $c = shift;
         my $path = $c->req->url->path;
         if ($path =~ qr{/cacheable/}) {
@@ -67,7 +67,7 @@ use Mojo::Base 'Mojolicious';
       $r->route('/cacheable/:a')->to(cb => sub {
         $counter++;
         
-        Mojolicious::Plugin::Cache::Lite->set_expire(sub {time - $_[0] >= 2});
+        Mojolicious::Plugin::CacheLite->set_expire(sub {time - $_[0] >= 2});
         
         shift->render_text($counter);
       });

@@ -3,10 +3,10 @@ use warnings;
 use ExtUtils::MakeMaker;
 
 my %params = (
-    NAME          => 'Mojolicious::Plugin::Cache::Lite',
+    NAME          => 'Mojolicious::Plugin::CacheLite',
     AUTHOR        => 'sugama <sugama@jamadam.com>',
-    VERSION_FROM  => 'lib/Mojolicious/Plugin/Cache/Lite.pm',
-    ABSTRACT_FROM => 'lib/Mojolicious/Plugin/Cache/Lite.pm',
+    VERSION_FROM  => 'lib/Mojolicious/Plugin/CacheLite.pm',
+    ABSTRACT_FROM => 'lib/Mojolicious/Plugin/CacheLite.pm',
     LICENSE       => 'perl',
     PREREQ_PM     => {
     },
