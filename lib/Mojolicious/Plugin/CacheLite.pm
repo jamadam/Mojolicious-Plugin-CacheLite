@@ -138,6 +138,8 @@ The following is the default.
         }
     });
 
+returning undef causes cache generation and reference disabled.
+
 =head2 max_bytes => number [optional]
 
 Maximum byte length for total of cache sizes. Default is 5000000. Since it's

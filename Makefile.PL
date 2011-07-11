@@ -13,6 +13,7 @@ my %params = (
     BUILD_REQUIRES => {
         'Test::More'          => '0.47',
         'Test::UseAllModules' => '0.10',
+        'Mojolicious'    	  => '1.59',
     },
     META_MERGE => {
         resources => {
