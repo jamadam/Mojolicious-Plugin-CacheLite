@@ -4,6 +4,7 @@ use warnings;
 our $VERSION = '0.01';
 use base qw/Mojolicious::Plugin/;
 use Mojo::Cache::Extended;
+use Time::HiRes qw(time);
 
     our $_EXPIRE_CODE_ARRAY = [];
     
@@ -23,6 +24,10 @@ use Mojo::Cache::Extended;
         
         if ($conf->{max_bytes}) {
             $cache->max_bytes($conf->{max_bytes});
+        }
+        
+        if ($conf->{max_keys}) {
+            $cache->max_keys($conf->{max_keys});
         }
         
         my $on_process_org = $app->on_process;
@@ -46,7 +51,13 @@ use Mojo::Cache::Extended;
             
             local $_EXPIRE_CODE_ARRAY;
             
+            my $ts_s = time;
+            
             $on_process_org->($app, $c);
+            
+            if ($conf->{threshold} && time - $ts_s < $conf->{threshold}) {
+                $active = 0;
+            }
             
             my $code = $c->res->code;
             
@@ -81,6 +92,8 @@ Mojolicious::Plugin::CacheLite - On memory cache plugin [ALPHA]
         
         $self->plugin(cache_lite => {
             max_bytes => 1000000,
+            max_keys  => 100,
+            threshold => 0.08,
             keygen => sub {
                 my $c = shift;
                 
@@ -114,6 +127,42 @@ output involves not only one data model and each of the models may should have
 own cache expiration conditions. To expire a cache exactly right timing,
 the cache itself must know when to expire. The feature of this class provides
 the mechanism.
+
+=head1 OPTIONS
+
+=head2 keygen => code reference [optional]
+
+Key generator for cache entries. This must be givin in code reference.
+The following is the default.
+
+    $self->plugin(cache_lite => {
+        keygen => sub {
+            $c = shift; ## mojolicious controller
+            return $c->req->url->to_abs->to_string;
+        }
+    });
+
+=head2 max_bytes => number [optional]
+
+Maximum byte length for total of cache sizes. Default is 5000000. Since it's
+hard to measure the exact size of objects, this value must be considered for
+rough limitation for memory size.
+
+    $self->plugin(cache_lite => {max_keys => 5000000});
+
+=head2 max_keys => number [optional]
+
+Maximum number of cache keys, defaults to 100.
+
+    $self->plugin(cache_lite => {max_keys => 100});
+
+=head2 threshold => number [optional]
+
+Threshold time interval for page generation to activate cache generation.
+You can give it a floating number of second. This plugin measures how long
+the page generation spent the time and compares to the threshold. 
+
+    $self->plugin(cache_lite => {threshold => 0.8});
 
 =head1 METHODS
 
