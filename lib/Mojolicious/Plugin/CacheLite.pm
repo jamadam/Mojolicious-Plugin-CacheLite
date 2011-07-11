@@ -36,10 +36,9 @@ use Time::HiRes qw(time);
             
             my ($app, $c) = @_;
             
-            my $active = ($c->req->method eq 'GET');
-            my $key = $keygen->($c);
+            my $key = ($c->req->method eq 'GET') ? $keygen->($c) : undef;
             
-            if ($active && $key) {
+            if ($key) {
                 my $res = $cache->get($key);
                 if (defined $res) {
                     $app->log->debug("serving from cache for $key");
@@ -55,11 +54,7 @@ use Time::HiRes qw(time);
             
             $on_process_org->($app, $c);
             
-            if ($conf->{threshold} && time - $ts_s < $conf->{threshold}) {
-                $active = 0;
-            }
-            
-            if ($active && $key) {
+            if ($key && time - $ts_s > ($conf->{threshold} || 0)) {
                 my $code = $c->res->code;
                 if ($code && $code == 200) {
                     $app->log->debug("storing in cache for $key");

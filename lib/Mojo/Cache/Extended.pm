@@ -6,11 +6,11 @@ use Mojo::Base -base;
     has 'max_keys' => 100;
     has 'max_bytes' => 5000000;
     
-    my $ATTR_CACHE = 1;
-    my $ATTR_STACK = 2;
-    my $ATTR_TOTAL = 3;
-    my $ATTR_EXPIRE = 4;
-    my $ATTR_TIMESTAMP = 5;
+    my $ATTR_CACHE      = 1;
+    my $ATTR_STACK      = 2;
+    my $ATTR_TOTAL      = 3;
+    my $ATTR_EXPIRE     = 4;
+    my $ATTR_TIMESTAMP  = 5;
     
     sub get {
         if ($_[0]->{$ATTR_EXPIRE}) {
