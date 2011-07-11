@@ -2,6 +2,7 @@
 
 use strict;
 use warnings;
+use utf8;
 
 # Disable Bonjour, IPv6, epoll and kqueue
 BEGIN {
@@ -38,17 +39,17 @@ $t->get_ok('/cacheable/2')
   ->status_is(200)
   ->content_is('7');
 
+$t->get_ok('/cacheable/mb')
+  ->status_is(200)
+  ->content_is('♥');
+
+$t->get_ok('/cacheable/mb')
+  ->status_is(200)
+  ->content_is('♥');
+
 package MojoliciousTestCached1;
 use Mojo::Base 'Mojolicious';
     
-    sub development_mode {
-      my $self = shift;
-    
-      # Static root for development
-      $self->static->root($self->home->rel_dir('public_dev'));
-    }
-    
-    # "Let's face it, comedy's a dead art form. Tragedy, now that's funny."
     sub startup {
       my $self = shift;
       
@@ -62,6 +63,9 @@ use Mojo::Base 'Mojolicious';
       
       my $r = $self->routes;
       my $counter = 5;
+      $r->route('/cacheable/mb')->to(cb => sub {
+        shift->render_text('♥');
+      });
       $r->route('/cacheable/:a')->to(cb => sub {
         $counter++;
         shift->render_text($counter);

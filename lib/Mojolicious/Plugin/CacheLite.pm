@@ -56,8 +56,10 @@ use Mojo::Cache::Extended;
             if ($active && $key && $code && $code == 200) {
                 $app->log->debug("storing in cache for $key");
                 my %header = %{$c->res->headers};
+                my $body = $c->res->body;
+                utf8::decode($body);
                 $cache->set($key, Mojo::JSON->encode({
-                    body    => $c->res->body,
+                    body    => $body,
                     headers => \%header,
                     code    => $c->res->code,
                 }));
