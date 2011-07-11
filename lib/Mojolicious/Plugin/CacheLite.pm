@@ -4,7 +4,7 @@ use warnings;
 our $VERSION = '0.01';
 use base qw/Mojolicious::Plugin/;
 use Mojo::JSON;
-use Mojo::Cache::Extended;
+use Mojo::Cache::Response;
 
     our $_EXPIRE_CODE_ARRAY = [];
     
@@ -20,7 +20,7 @@ use Mojo::Cache::Extended;
             shift->req->url->to_abs->to_string;
         };
         
-        my $cache = Mojo::Cache::Extended->new();
+        my $cache = Mojo::Cache::Response->new();
         
         if ($conf->{max_bytes}) {
             $cache->max_bytes($conf->{max_bytes});

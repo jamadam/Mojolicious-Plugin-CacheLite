@@ -1,4 +1,4 @@
-package Mojo::Cache::Extended;
+package Mojo::Cache::Response;
 use strict;
 use warnings;
 use Mojo::Base -base;
@@ -73,13 +73,13 @@ __END__
 
 =head1 NAME
 
-Mojo::Cache::Extended - 
+Mojo::Cache::Response - 
 
 =head1 SYNOPSIS
 
 =head1 DESCRIPTION
 
-L<Mojo::Cache::Extended> class represents caches. 
+L<Mojo::Cache::Response> class represents caches. 
 
 Note that this module is EXPERIMENTAL and might change without warning!
 
