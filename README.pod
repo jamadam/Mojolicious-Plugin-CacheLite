@@ -14,7 +14,7 @@ Mojolicious::Plugin::CacheLite - On memory cache plugin [ALPHA]
         or
         
         $self->plugin(cache_lite => {
-            max_bytes => 1000000,
+            max_size => 1000000,
             max_keys  => 100,
             threshold => 0.08,
             keygen => sub {
@@ -67,13 +67,13 @@ The following is the default.
 
 returning undef causes cache generation and reference disabled.
 
-=head2 max_bytes => number [optional]
+=head2 max_size => number [optional]
 
-Maximum byte length for total of cache sizes. Default is 5000000. Since it's
-hard to measure the exact size of objects, this value must be considered for
-rough limitation for memory size.
+Maximum byte length for total of body lengths of cache. Default is 5000000.
+Since it only measures body length, this value must be considered for rough
+limitation for memory size.
 
-    $self->plugin(cache_lite => {max_keys => 5000000});
+    $self->plugin(cache_lite => {max_size => 5000000});
 
 =head2 max_keys => number [optional]
 

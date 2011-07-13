@@ -4,7 +4,8 @@ use warnings;
 use Mojo::Base -base;
     
     has 'max_keys' => 100;
-    has 'max_bytes' => 5000000;
+    has 'max_size' => 5000000;
+    has 'size_of';
     
     my $ATTR_CACHE      = 1;
     my $ATTR_STACK      = 2;
@@ -29,16 +30,17 @@ use Mojo::Base -base;
         my ($self, $key, $value) = @_;
         
         my $keys  = $self->max_keys;
-        my $max_length = $self->max_bytes;
+        my $max_length = $self->max_size;
+        my $size_of = $self->size_of;
         my $cache = $self->{$ATTR_CACHE} ||= {};
         my $stack = $self->{$ATTR_STACK} ||= [];
         my $ts = $self->{$ATTR_TIMESTAMP} ||= {};
         $self->{$ATTR_TOTAL} ||= 0;
-        $self->{$ATTR_TOTAL} += guess_size_of($value);
+        $self->{$ATTR_TOTAL} += $size_of->($value) if $size_of;
         
         while (@$stack >= $keys || $self->{$ATTR_TOTAL} > $max_length) {
             my $key = shift @$stack;
-            $self->{$ATTR_TOTAL} -= guess_size_of($cache->{$key});
+            $self->{$ATTR_TOTAL} -= $size_of->($cache->{$key}) if $size_of;
             delete $cache->{$key};
             delete $ts->{$key};
         }
@@ -53,28 +55,6 @@ use Mojo::Base -base;
     sub set_expire {
         my ($self, $key, $cb) = @_;
         push(@{$self->{$ATTR_EXPIRE}->{$key}}, $cb);
-    }
-    
-    sub guess_size_of {
-        
-        my $obj = shift;
-        my $res = 0;
-        if (ref $obj && (my $type = ("$obj" =~ qr{(?:^|=)(\w+)\(})[0])) {
-            if ($type eq 'ARRAY') {
-                for my $a (@$obj) {
-                    $res += guess_size_of($a);
-                }
-            } elsif ($type eq 'HASH') {
-                while (my ($key, $value) = each(%$obj)) {
-                    $res += length($key) + guess_size_of($value);
-                }
-            } elsif ($type eq 'SCALAR') {
-                $res = length($$obj);
-            }
-        } elsif ($obj) {
-            $res = length($obj);
-        }
-        $res;
     }
 
 1;
@@ -103,12 +83,18 @@ L<Mojo::Cache> implements the following attributes.
 
 Maximum number of cache keys, defaults to C<100>.
 
-=head2 C<max_bytes>
+=head2 C<max_size>
 
-  my $max_bytes = $cache->max_bytes;
-  $cache       = $cache->max_bytes(10000000);
+  my $max_size = $cache->max_size;
+  $cache       = $cache->max_size(10000000);
 
 Maximum size of value length sum, defaults to C<5000000>.
+
+=head2 C<size_of>
+
+  $cache->size_of(sub {length(shift)});
+
+This attribute specifies the rule for measure the size of cache.
 
 =head1 METHODS
 
