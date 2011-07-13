@@ -8,7 +8,7 @@ use Mojo::Message::Response;
 use Test::Mojo;
 
 my $cachea = Mojo::Cache->new(max_keys => 2);
-my $cacheb = Mojo::Cache::Extended->new(max_keys => 2);
+my $cacheb = Mojo::Cache::Extended->new(max_keys => 2, size_of => sub {shift->content->body_size});
 
 my $keya = 1;
 my $keyb = 1;

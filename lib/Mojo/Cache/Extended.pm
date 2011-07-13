@@ -10,20 +10,17 @@ use Mojo::Base -base;
     my $ATTR_CACHE      = 1;
     my $ATTR_STACK      = 2;
     my $ATTR_TOTAL      = 3;
-    my $ATTR_EXPIRE     = 4;
-    my $ATTR_TIMESTAMP  = 5;
     
     sub get {
-        if ($_[0]->{$ATTR_EXPIRE}) {
-            if (my $expire = $_[0]->{$ATTR_EXPIRE}->{$_[1]}) {
-                for my $code (@$expire) {
-                    if ($code->($_[0]->{$ATTR_TIMESTAMP}->{$_[1]})) {
-                        return;
-                    }
+        my $cache = ($_[0]->{$ATTR_CACHE} || {})->{$_[1]};
+        if ($cache->[3]) {
+            for my $code (@{$cache->[3]}) {
+                if ($code->($cache->[1])) {
+                    return;
                 }
             }
         }
-        ($_[0]->{$ATTR_CACHE} || {})->{$_[1]};
+        $cache->[0];
     }
     
     sub set {
@@ -34,27 +31,25 @@ use Mojo::Base -base;
         my $size_of = $self->size_of;
         my $cache = $self->{$ATTR_CACHE} ||= {};
         my $stack = $self->{$ATTR_STACK} ||= [];
-        my $ts = $self->{$ATTR_TIMESTAMP} ||= {};
+        my $length = $size_of->($value) if $size_of;
         $self->{$ATTR_TOTAL} ||= 0;
-        $self->{$ATTR_TOTAL} += $size_of->($value) if $size_of;
+        $self->{$ATTR_TOTAL} += $length || 0;
         
         while (@$stack >= $keys || $self->{$ATTR_TOTAL} > $max_size) {
             my $key = shift @$stack;
-            $self->{$ATTR_TOTAL} -= $size_of->($cache->{$key}) if $size_of;
+            $self->{$ATTR_TOTAL} -= $cache->{$key}->[2] || 0;
             delete $cache->{$key};
-            delete $ts->{$key};
         }
         
         push @$stack, $key;
-        $cache->{$key} = $value;
-        $ts->{$key} = time;
+        $cache->{$key} = [$value, time, $length, undef];
         
         return $self;
     }
     
     sub set_expire {
         my ($self, $key, $cb) = @_;
-        push(@{$self->{$ATTR_EXPIRE}->{$key}}, $cb);
+        push(@{$self->{$ATTR_CACHE}->{$key}->[3]}, $cb);
     }
 
 1;
