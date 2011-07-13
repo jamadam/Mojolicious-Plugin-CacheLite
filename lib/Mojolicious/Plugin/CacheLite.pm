@@ -38,33 +38,33 @@ use Time::HiRes qw(time);
             
             my ($app, $c) = @_;
             
-            my $key = ($c->req->method eq 'GET') ? $keygen->($c) : undef;
-            
-            if ($key) {
-                my $res = $cache->get($key);
-                if (defined $res) {
+            if ($c->req->method eq 'GET' && (my $key = $keygen->($c))) {
+                
+                if (my $res = $cache->get($key)) {
                     $app->log->debug("serving from cache for $key");
                     $c->tx->res($res);
                     $c->rendered;
                     return;
                 }
-            }
-            
-            local $_EXPIRE_CODE_ARRAY;
-            
-            my $ts_s = time;
-            
-            $on_process_org->($app, $c);
-            
-            if ($key && time - $ts_s > ($conf->{threshold} || 0)) {
-                my $code = $c->res->code;
-                if ($code && $code == 200) {
-                    $app->log->debug("storing in cache for $key");
-                    $cache->set($key, $c->res);
-                    for my $code (@$_EXPIRE_CODE_ARRAY) {
-                        $cache->set_expire($key, $code);
+                
+                local $_EXPIRE_CODE_ARRAY;
+                
+                my $ts_s = time;
+                
+                $on_process_org->($app, $c);
+                
+                if (time - $ts_s > ($conf->{threshold} || 0)) {
+                    my $code = $c->res->code;
+                    if ($code && $code == 200) {
+                        $app->log->debug("storing in cache for $key");
+                        $cache->set($key, $c->res);
+                        for my $code (@$_EXPIRE_CODE_ARRAY) {
+                            $cache->set_expire($key, $code);
+                        }
                     }
                 }
+            } else {
+                $on_process_org->($app, $c);
             }
         });
     }
