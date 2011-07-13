@@ -30,7 +30,7 @@ use Mojo::Base -base;
         my ($self, $key, $value) = @_;
         
         my $keys  = $self->max_keys;
-        my $max_length = $self->max_size;
+        my $max_size = $self->max_size;
         my $size_of = $self->size_of;
         my $cache = $self->{$ATTR_CACHE} ||= {};
         my $stack = $self->{$ATTR_STACK} ||= [];
@@ -38,7 +38,7 @@ use Mojo::Base -base;
         $self->{$ATTR_TOTAL} ||= 0;
         $self->{$ATTR_TOTAL} += $size_of->($value) if $size_of;
         
-        while (@$stack >= $keys || $self->{$ATTR_TOTAL} > $max_length) {
+        while (@$stack >= $keys || $self->{$ATTR_TOTAL} > $max_size) {
             my $key = shift @$stack;
             $self->{$ATTR_TOTAL} -= $size_of->($cache->{$key}) if $size_of;
             delete $cache->{$key};
