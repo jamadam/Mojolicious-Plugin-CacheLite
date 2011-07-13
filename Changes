@@ -1,6 +1,9 @@
 Revision history for Mojolicious-Plugin-CacheLite
 
-0.02 2011/07/11
+0.03 2011/07/13
+
+0.02 2011/07/13
+  - Cache size measuring method changed for performance.
 
 0.01 2011/07/11
   - initial release

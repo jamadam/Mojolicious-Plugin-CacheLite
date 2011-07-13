@@ -1,7 +1,7 @@
 package Mojolicious::Plugin::CacheLite;
 use strict;
 use warnings;
-our $VERSION = '0.02';
+our $VERSION = '0.03';
 use base qw/Mojolicious::Plugin/;
 use Mojo::Cache::Extended;
 use Time::HiRes qw(time);
