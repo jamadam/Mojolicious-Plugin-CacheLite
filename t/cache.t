@@ -74,3 +74,6 @@ $cache->set_expire('foo' => sub{
 });
 sleep(1);
 is $cache->get('foo'), undef, 'has expired';
+
+$cache = Mojo::Cache::Extended->new();
+is eval {$cache->get('a')} ,undef, 'non exist key';

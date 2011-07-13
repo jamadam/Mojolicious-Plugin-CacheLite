@@ -12,15 +12,16 @@ use Mojo::Base -base;
     my $ATTR_TOTAL      = 3;
     
     sub get {
-        my $cache = ($_[0]->{$ATTR_CACHE} || {})->{$_[1]};
-        if ($cache->[3]) {
-            for my $code (@{$cache->[3]}) {
-                if ($code->($cache->[1])) {
-                    return;
+        if (my $cache = $_[0]->{$ATTR_CACHE}->{$_[1]}) {
+            if ($cache->[3]) {
+                for my $code (@{$cache->[3]}) {
+                    if ($code->($cache->[1])) {
+                        return;
+                    }
                 }
             }
+            $cache->[0];
         }
-        $cache->[0];
     }
     
     sub set {
@@ -28,12 +29,14 @@ use Mojo::Base -base;
         
         my $keys  = $self->max_keys;
         my $max_size = $self->max_size;
-        my $size_of = $self->size_of;
         my $cache = $self->{$ATTR_CACHE} ||= {};
         my $stack = $self->{$ATTR_STACK} ||= [];
-        my $length = $size_of->($value) if $size_of;
         $self->{$ATTR_TOTAL} ||= 0;
-        $self->{$ATTR_TOTAL} += $length || 0;
+        my $length;
+        if (my $size_of = $self->size_of) {
+            $length = $size_of->($value);
+            $self->{$ATTR_TOTAL} += $length;
+        }
         
         while (@$stack >= $keys || $self->{$ATTR_TOTAL} > $max_size) {
             my $key = shift @$stack;
