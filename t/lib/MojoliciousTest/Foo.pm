@@ -21,6 +21,16 @@ sub index {
   $self->stash(handler => 'xpl', msg => 'Hello World!');
 }
 
+sub plugin_camel_case {
+  my $self = shift;
+  $self->render_text($self->some_plugin);
+}
+
+sub plugin_upper_case {
+  my $self = shift;
+  $self->render_text($self->upper_case_test_plugin);
+}
+
 sub session_domain {
   my $self = shift;
   $self->session(user => 'Bender');
@@ -46,7 +56,7 @@ sub stage1 {
 
 sub stage2 {
   my $self = shift;
-  $self->render_text($self->test_plugin);
+  $self->render_text($self->some_plugin);
 }
 
 sub syntaxerror { shift->render('syntaxerror', format => 'html') }

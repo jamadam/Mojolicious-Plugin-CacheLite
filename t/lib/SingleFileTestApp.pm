@@ -11,13 +11,13 @@ sub startup {
   $self->log->level('fatal');
 
   # Plugin
-  $self->plugin('MojoliciousTest::Plugin::TestPlugin');
+  $self->plugin('MojoliciousTest::Plugin::Test::SomePlugin2');
 
   # Helper route
   $self->routes->route('/helper')->to(
     cb => sub {
       my $self = shift;
-      $self->render(text => $self->test_plugin);
+      $self->render(text => $self->some_plugin);
     }
   );
 
@@ -45,6 +45,12 @@ sub data_template2 {
   );
 }
 
+sub data_static {
+  my $self = shift;
+  $self->stash(static_class => __PACKAGE__);
+  $self->render_static('singlefiletestapp/foo.txt');
+}
+
 sub index { shift->stash(template => 'withlayout', msg => 'works great!') }
 
 1;
@@ -53,3 +59,5 @@ __DATA__
 <%= 20 + 3 %> works!
 @@ too.html.epl
 This one works too!
+@@ singlefiletestapp/foo.txt
+And this one... ALL GLORY TO THE HYPNOTOAD!

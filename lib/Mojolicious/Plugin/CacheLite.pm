@@ -32,11 +32,9 @@ use Time::HiRes qw(time);
             $cache->max_keys($conf->{max_keys});
         }
         
-        my $on_process_org = $app->on_process;
-        
-        $app->on_process(sub {
-            
-            my ($app, $c) = @_;
+        $app->hook('around_dispatch' => sub {
+            my ($next, $c) = @_;
+            $app = $c->app;
             
             if ($c->req->method eq 'GET' && (my $key = $keygen->($c))) {
                 
@@ -51,7 +49,7 @@ use Time::HiRes qw(time);
                 
                 my $ts_s = time;
                 
-                $on_process_org->($app, $c);
+                $next->();
                 
                 if (time - $ts_s > ($conf->{threshold} || 0)) {
                     my $code = $c->res->code;
@@ -64,7 +62,7 @@ use Time::HiRes qw(time);
                     }
                 }
             } else {
-                $on_process_org->($app, $c);
+                $next->();
             }
         });
     }
